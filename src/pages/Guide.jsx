@@ -1,8 +1,8 @@
 import { useState } from "react";
-import CustomDataTable from "../components/customDataTable";
+import DataTable from "../components/DataTable";
 
 // Demo Component showing usage
-const DataTableGuide = () => {
+export const DataTableGuide = () => {
   const [selectedRow, setSelectedRow] = useState(null);
 
   // Sample data
@@ -203,7 +203,7 @@ const DataTableGuide = () => {
         </div>
 
         {/* Table Demo */}
-        <CustomDataTable
+        <DataTable
           rows={sampleRows}
           columns={columns}
           onRowClick={(row) => setSelectedRow(row)}
@@ -345,4 +345,58 @@ const DataTableGuide = () => {
   );
 };
 
-export default DataTableGuide;
+
+// ============================================================================
+// EXAMPLE USAGE
+// ============================================================================
+
+export const myDataTableGuide = () => {
+  const sampleData = Array.from({ length: 250 }, (_, i) => ({
+    id: i + 1,
+    patientName: `Patient ${i + 1}`,
+    mrn: `MRN${String(i + 1).padStart(6, '0')}`,
+    lastVisit: new Date(2024, 0, 1 + (i % 365)).toLocaleDateString(),
+    status: ['Active', 'Pending', 'Completed'][i % 3],
+    visits: Math.floor(Math.random() * 20) + 1,
+  }));
+
+  const columns = [
+    { field: 'patientName', headerName: 'Patient Name', sortable: true },
+    { field: 'mrn', headerName: 'MRN', sortable: true },
+    { field: 'lastVisit', headerName: 'Last Visit', sortable: true },
+    { 
+      field: 'status', 
+      headerName: 'Status',
+      sortable: true,
+      renderCell: (row) => (
+        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+          row.status === 'Active' ? 'bg-green-100 text-green-700' :
+          row.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+          'bg-slate-100 text-slate-700'
+        }`}>
+          {row.status}
+        </span>
+      )
+    },
+    { field: 'visits', headerName: 'Total Visits', sortable: true },
+  ];
+
+  return (
+    <div className="p-8 bg-slate-50 min-h-screen">
+      <DataTable
+        title="Patient Registry"
+        description="Manage and view patient visit history"
+        rows={sampleData}
+        columns={columns}
+        pageSize={15}
+        onRowClick={(row) => console.log('Row clicked:', row)}
+        onActionClick={(row) => console.log('Action clicked:', row)}
+        onFilterClick={() => console.log('Filter clicked')}
+        enableSearch={true}
+        enablePagination={true}
+        enableSorting={true}
+        showActions={true}
+      />
+    </div>
+  );
+};

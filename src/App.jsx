@@ -7,7 +7,7 @@ import VisitHistory from './pages/VisitHistory';
 import PatientList from './pages/PatientList';
 import Login from './pages/login';
 import SignUp from './pages/SignUp';
-import DataTableGuide from './pages/Guide';
+import { DataTableGuide } from './pages/Guide';
 import ProtectedRoute from './components/ProtectedRoute';
 
 

@@ -22,8 +22,8 @@ export function AuthProvider({ children }) {
         {},
         { withCredentials: true }
       );
-      setAccessToken(res.data.accessToken);
       AuthStore.setAccessToken(res.data.accessToken);
+      setAccessToken(res.data.accessToken);
       setUser(res.data.user);
 
     } catch (err) {    

@@ -1,8 +1,15 @@
 import API from "../intercepator";
 
-export const getVisits = async (search , page , limit , columnsName ) => {
+export const getVisits = async (search , page , pageSize , columnFields, sort ) => {
 
-    const res = await API.get("/visit", { params: { search , page , limit , columnsName: columnsName?.join(",")} } );    
+    const params = { search, page, pageSize, columnFields };
+
+    if (sort?.field) {
+        params.sortField = sort.field;
+        params.sortDirection = sort.direction;
+    }
+
+    const res = await API.get("/visit", { params });    
     return res.data
  
 }

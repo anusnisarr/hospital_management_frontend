@@ -1,7 +1,7 @@
 // In your parent component (e.g., PatientManagement.jsx)
 
 import { useState, useEffect } from "react";
-import CustomDataTable from "../components/customDataTable";
+import DataTable from "../components/DataTable";
 import { Chip, Typography } from "@mui/material";
 import { MoreHorizontal } from 'lucide-react';
 import { getVisits } from "../api/services/visitService";
@@ -160,7 +160,7 @@ export default function PatientManagement() {
   };
 
   return (
-    <CustomDataTable
+    <DataTable
       // Your existing props
       rows={visitData.rows}
       columns={columns}

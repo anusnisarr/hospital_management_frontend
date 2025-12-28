@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, ChevronLeft, ChevronRight, MoreHorizontal, Filter } from 'lucide-react';
 
-const CustomDataTable = ({
+const DataTable = ({
   title = "Patient Registry",
   description = "Manage and view visit history",
   rows = [],
@@ -121,4 +121,4 @@ const theme = {
   );
 };
 
-export default CustomDataTable
+export default DataTable
