@@ -1,7 +1,7 @@
 // In your parent component (e.g., PatientManagement.jsx)
 
 import { useState, useEffect } from "react";
-import DataTable from "../components/DataTable";
+import DataTable from "../components/dataTable";
 import { Chip, Typography } from "@mui/material";
 import { MoreHorizontal } from 'lucide-react';
 import { getVisits } from "../api/services/visitService";

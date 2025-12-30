@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DataTable from "../components/DataTable";
+import DataTable from "../components/dataTable";
 
 // Demo Component showing usage
 export const DataTableGuide = () => {
