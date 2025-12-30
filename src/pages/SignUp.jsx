@@ -4,6 +4,7 @@ import { UserPlus, Mail, Lock } from "lucide-react";
 import axios from "axios";
 import { Link } from 'react-router-dom';
 import clsx from "clsx";
+import { useNavigate } from 'react-router-dom';
 
 const api = axios.create({ baseURL: import.meta.env.VITE_BASE_PATH || "" });
 
@@ -13,7 +14,7 @@ export default function Signup({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [serverMsg, setServerMsg] = useState("");
 
-  console.log(form);
+  const navigate = useNavigate();
   
 
   const validate = () => {
@@ -41,6 +42,7 @@ export default function Signup({ onSuccess }) {
       });
       setServerMsg("Account created. Redirecting...");
       onSuccess?.(res.data);
+      navigate("/", { replace: true });
     } catch (err) {
       setServerMsg(err.response?.data?.message || "Signup failed.");
     } finally {
