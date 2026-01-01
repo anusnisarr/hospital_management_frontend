@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { usePatientColumns , columnFields } from '../constants/patientColumns'
 import { getPatient } from "../api/services/patientService";
-import DataTable from '../components/DataTable';
+import DataTable from '../components/dataTable';
 
 export default function PatientList() {
   const [patientData, setPatentData] = useState({ rows: [], total: 0 });
