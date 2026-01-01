@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 // import PatientFileModal from "./PatientModal";
-import { getTodayVisits , createNewVisitAndPatient , createVisit } from "../api/services/visitService.js";
+import { getAllTodayVisits , createNewVisitAndPatient , createVisit } from "../api/services/visitService.js";
 import { getPatientByPhone, updatedPatientDetails } from "../api/services/patientService.js";
 import TokenReceipt from "../components/TokenReceiptViewer.jsx";
 import { socket } from "../socket.js";
@@ -97,7 +97,7 @@ const PatientRegistration = () => {
 
     try {
       setLoading(true);
-      const res = await getTodayVisits()
+      const res = await getAllTodayVisits()
 
       setTodayVisits(res);
     } catch (error) {

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import DataTable from "../components/DataTable";
 import { Chip, Typography } from "@mui/material";
 import { MoreHorizontal } from 'lucide-react';
-import { getVisits } from "../api/services/visitService";
+import { getTodayVisits } from "../api/services/visitService";
 
 export default function PatientManagement() {
   const [visitData, setVisitData] = useState({ rows: [], total: 0 });
@@ -20,10 +20,10 @@ export default function PatientManagement() {
     fetchData(paginationModel.page, paginationModel.pageSize, search);
   }, [paginationModel, search]);
 
-  const fetchData = async (page, pageSize, search) => {
+  const fetchData = async (page= 1, pageSize= 50, search , sort) => {
     setIsLoading(true);
     try {
-      const data = await getVisits(search, page + 1, pageSize);
+      const data = await getTodayVisits(search, paginationModel.page + 1, paginationModel.pageSize , sort);
       setVisitData({ rows: data.data, total: data.total });
     } catch (err) {
       setError(err.response.data);
@@ -160,38 +160,64 @@ export default function PatientManagement() {
   };
 
   return (
-    <DataTable
-      // Your existing props
-      rows={visitData.rows}
-      columns={columns}
-      total={visitData.total}
-      loading={isLoading}
-      error={error}
-      paginationModel={paginationModel}
-      onPaginationChange={setPaginationModel}
-      onFilterModelChange={handleSearchChange}
-      title="Visit History"
-
-      // New props for buttons and dialog
-      showActionButtons={true}
-      onStatusUpdate={handleStatusUpdate}
-      onSaveVisit={handleSaveVisit}
-      onViewDetails={handleViewDetails}
-
-
-      // Optional: Customize buttons
-      actionButtonsConfig={{
-        showDone: true,
-        showHold: true,
-        showDetails: true,
-      }}
-
-      // Optional: Customize dialog
-      detailsDialogConfig={{
-        showPatientInfo: true,
-        showMedicalHistory: true,
-        enableVisitForm: true,
-      }}
-    />
+   <div className="p-8 bg-slate-50 min-h-screen">
+  
+        {/* Error Display */}
+        {error && (
+          <div className="fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl mt-4">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full"></div>
+              <p className="text-sm font-medium text-red-800">{error}</p>
+            </div>
+          </div>
+          </div>
+        )}
+  
+        {/* Loading Overlay - Sticky at top */}
+        {isLoading && (
+          <div className="fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl mt-4">
+            <div className="mx-4 p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-lg backdrop-blur-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <p className="text-sm font-medium text-blue-800">Loading visit history...</p>
+              </div>
+            </div>
+          </div>
+        )}
+  
+        <DataTable
+          title="Dcotor Screen"
+          description="Search & view Patient Data"
+          rows={visitData.rows}
+          columns={columns}
+          pageSize={15}
+          serverSide={true}
+          serverTotalCount={visitData.total}
+          onServerStateChange={fetchData}
+          
+          onRowClick={(row) => {
+      
+          }}
+          onActionClick={(row) => {
+      
+          }}
+          onFilterClick={() => {
+      
+          }}
+          
+          enableSearch={true}
+          enablePagination={true}
+          enableSorting={true}
+          showActions={true}
+          
+          customTheme={{
+            heading: "text-[26px] font-extrabold text-slate-900 tracking-tight",
+            subheading: "text-[15px] font-medium text-slate-600",
+          }}
+        />
+      </div>
   );
 }
