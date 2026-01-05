@@ -113,7 +113,7 @@ const TableHeader = memo(
     showFilter = true,
   }) => {
     return (
-      <div className="px-8 py-8 border-b border-slate-100 bg-white">
+      <div className="px-6 py-5 border-b border-slate-100 bg-white">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
             <h2 className={theme.heading}>{title}</h2>

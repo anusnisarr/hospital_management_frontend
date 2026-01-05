@@ -1,223 +1,515 @@
-// In your parent component (e.g., PatientManagement.jsx)
+import { useState, useEffect, useRef, useCallback } from "react";
+import { 
+  Clock, User, Phone, Calendar, FileText, Activity, 
+  CheckCircle2, Pause, AlertCircle, ChevronRight, X,
+  History, Stethoscope, Pill, FileHeart, ArrowLeft, RefreshCw
+} from 'lucide-react';
 
-import { useState, useEffect } from "react";
-import DataTable from "../components/dataTable";
-import { Chip, Typography } from "@mui/material";
-import { MoreHorizontal } from 'lucide-react';
-import { getTodayVisits } from "../api/services/visitService";
+// ============================================================================
+// DESIGN SYSTEM - Matches your DataTable UI
+// ============================================================================
+const theme = {
+  page: "p-8 bg-slate-50 min-h-screen",
+  card: "bg-white border border-slate-200 rounded-2xl shadow-sm",
+  cardHover: "bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all",
+  h1: "text-[26px] font-extrabold text-slate-900 tracking-tight",
+  h2: "text-[20px] font-bold text-slate-900",
+  body: "text-[15px] font-medium text-slate-600",
+  label: "text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]",
+  btnPrimary: "px-4 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all shadow-sm",
+  btnSecondary: "px-4 py-2.5 border-2 border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all",
+  btnSuccess: "px-4 py-2.5 bg-emerald-500 text-white text-sm font-bold rounded-xl hover:bg-emerald-600 transition-all shadow-sm",
+  btnWarning: "px-4 py-2.5 border-2 border-amber-500 text-amber-700 text-sm font-bold rounded-xl hover:bg-amber-50 transition-all",
+  input: "px-4 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-slate-700 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 focus:bg-white outline-none transition-all",
+};
 
-export default function PatientManagement() {
-  const [visitData, setVisitData] = useState({ rows: [], total: 0 });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 50 });
-  const [search, setSearch] = useState("");
-  const [selectedRow, setSelectedRow] = useState(null);
-  const env = import.meta.env;
+// Mock API - Replace with your actual API calls
+const fetchDoctorQueue = async () => {
+  return {
+    pending: 12,
+    inProgress: 1,
+    completed: 8,
+    patients: [
+      {
+        id: 1,
+        tokenNo: "A101",
+        fullName: "Noman Ali",
+        age: 35,
+        gender: "Male",
+        phone: "+92 300 1234567",
+        appointmentType: "Consultation",
+        registrationTime: "09:30 AM",
+        status: "pending",
+        priority: "normal",
+        chiefComplaint: "Persistent headache for 3 days",
+        vitals: { bp: "120/80", temp: "98.6°F", pulse: "72 bpm", weight: "75 kg" },
+        previousVisits: [
+          { date: "2024-11-15", diagnosis: "Migraine", medicines: ["Sumatriptan 50mg"] },
+          { date: "2024-10-20", diagnosis: "Common Cold", medicines: ["Paracetamol 500mg"] }
+        ],
+        currentMedications: ["Aspirin 75mg (daily)"],
+        allergies: ["Penicillin"]
+      },
+      {
+        id: 2,
+        tokenNo: "A102",
+        fullName: "Sarah Ahmed",
+        age: 28,
+        gender: "Female",
+        phone: "+92 301 9876543",
+        appointmentType: "Follow-up",
+        registrationTime: "09:45 AM",
+        status: "pending",
+        priority: "urgent",
+        chiefComplaint: "Follow-up for diabetes management",
+        vitals: { bp: "130/85", temp: "98.4°F", pulse: "78 bpm", weight: "68 kg" },
+        previousVisits: [
+          { date: "2024-11-01", diagnosis: "Type 2 Diabetes", medicines: ["Metformin 500mg"] }
+        ],
+        currentMedications: ["Metformin 500mg (twice daily)"],
+        allergies: []
+      },
+      {
+        id: 3,
+        tokenNo: "A103",
+        fullName: "Ahmed Hassan",
+        age: 45,
+        gender: "Male",
+        phone: "+92 302 5551234",
+        appointmentType: "New Patient",
+        registrationTime: "10:00 AM",
+        status: "pending",
+        priority: "normal",
+        chiefComplaint: "Chest pain and shortness of breath",
+        vitals: { bp: "140/90", temp: "98.6°F", pulse: "88 bpm", weight: "82 kg" },
+        previousVisits: [],
+        currentMedications: [],
+        allergies: ["Sulfa drugs"]
+      }
+    ]
+  };
+};
 
-  // Your existing fetchData function
+export default function DoctorKDSScreen() {
+  const [queueData, setQueueData] = useState({ pending: 0, inProgress: 0, completed: 0, patients: [] });
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [view, setView] = useState('queue');
+  const [filter, setFilter] = useState('all');
+
   useEffect(() => {
-    fetchData(paginationModel.page, paginationModel.pageSize, search);
-  }, [paginationModel, search]);
+    loadQueue();
+    const interval = setInterval(loadQueue, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const fetchData = async (page= 1, pageSize= 50, search , sort) => {
+  const loadQueue = async () => {
     setIsLoading(true);
     try {
-      const data = await getTodayVisits(search, paginationModel.page + 1, paginationModel.pageSize , sort);
-      setVisitData({ rows: data.data, total: data.total });
-    } catch (err) {
-      setError(err.response.data);
+      const data = await fetchDoctorQueue();
+      setQueueData(data);
+    } catch (error) {
+      console.error('Failed to load queue:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Define columns with custom rendering
-  const columns = [
-{
-  field: "tokenNo",
-  headerName: "Token",
-  width: 120,
-  renderCell: (row) => {
-    // Check if token exists
-    const token = row.tokenNo;
-
-    return (
-      <div className="flex items-center justify-start h-full">
-        <span className="inline-flex items-center justify-center px-2.5 py-1 bg-slate-900 text-white text-xs font-black tracking-tighter rounded-md shadow-sm border border-slate-900 min-w-[40px]">
-          #{token || "—"}
-        </span>
-      </div>
-    );
-  }
-},
-    {
-      field: "fullName",
-      headerName: "Patient Name",
-      width: 180,
-      renderCell: (params) => (
-        <Typography fontWeight={600}>{params.fullName}</Typography>
-      )
-    },
-    { field: "age", headerName: "Age", width: 80 },
-    { field: "gender", headerName: "Gender", width: 100 },
-    { field: "phone", headerName: "Phone", width: 140 },
-    { field: "appointmentType", headerName: "Type", width: 130 },
-    { field: "registrationTime", headerName: "Registration", width: 180 },
-    {
-      field: 'status',
-      headerName: 'Status',
-      renderCell: (row) => {
-        // Logic for muted-pill style
-        const statusStyles = {
-          Completed: "bg-emerald-50 text-emerald-700 border-emerald-100",
-          Pending: "bg-amber-50 text-amber-700 border-amber-100",
-          Cancelled: "bg-slate-50 text-slate-600 border-slate-200"
-        };
-
-        return (
-          <span className={`px-3 py-1 rounded-full text-[15px] font-bold border ${statusStyles[row.status] || statusStyles.Cancelled}`}>
-            {row.status}
-          </span>
-        );
-      }
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: "250px",
-      align: "right", // Professional tables usually right-align actions
-      renderCell: (row) => (
-        <div className="flex items-center justify-end gap-2 pr-2">
-          {/* 1. "Done" - Clean Outline Style */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              alert(`Marking ${row.fullName} as done`);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-base font-bold text-slate-600 border border-slate-200 rounded-md hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-all group"
-          >
-            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 group-hover:scale-125 transition-transform" />
-            Done
-          </button>
-
-          {/* 2. "Hold" - Subtle Muted Style */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              alert(`Putting ${row.fullName} on hold`);
-            }}
-            className="px-3 py-1.5 text-base font-bold text-slate-600 border border-slate-200 rounded-md hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200 transition-all"
-          >
-            Hold
-          </button>
-        </div>
-      )
-    }
-  ];
-
-  // Handler functions
-  const handleStatusUpdate = (patientId, newStatus, rowData) => {
-    console.log('Update status:', patientId, newStatus);
-
-    // Socket emit
-    socket.emit("status-updated", {
-      patientId: patientId,
-      newStatus: newStatus
-    });
-
-    // Update local state
-    setVisitData(prev => ({
+  const handleStatusUpdate = useCallback((patientId, newStatus) => {
+    setQueueData(prev => ({
       ...prev,
-      rows: prev.rows.map(row =>
-        row.id === patientId ? { ...row, status: newStatus } : row
+      patients: prev.patients.map(p => 
+        p.id === patientId ? { ...p, status: newStatus } : p
       )
     }));
-  };
-
-  const handleSaveVisit = async (patientId, visitData) => {
-    try {
-      await axios.patch(
-        `${env.VITE_BASE_PATH}/patient/updateMedicalHistory/${patientId}`,
-        visitData
-      );
-      // Refresh data
-      fetchData(paginationModel.page, paginationModel.pageSize, search);
-      alert("Visit saved successfully!");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to save visit");
+    
+    if (newStatus === 'completed') {
+      setQueueData(prev => ({
+        ...prev,
+        pending: prev.pending - 1,
+        completed: prev.completed + 1
+      }));
+      setTimeout(() => {
+        setView('queue');
+        setSelectedPatient(null);
+      }, 1000);
     }
-  };
+  }, []);
 
-  const handleViewDetails = (rowData) => {
-    console.log('View details for:', rowData);
-  };
+  const filteredPatients = queueData.patients.filter(p => {
+    if (filter === 'pending') return p.status === 'pending';
+    if (filter === 'urgent') return p.priority === 'urgent';
+    return true;
+  });
 
-  const handleSearchChange = (model) => {
-    const text = model.quickFilterValues?.join(" ") || "";
-    setSearch(text);
+  if (view === 'detail' && selectedPatient) {
+    return <PatientDetailView 
+      patient={selectedPatient} 
+      onBack={() => { setView('queue'); setSelectedPatient(null); }}
+      onStatusUpdate={handleStatusUpdate}
+    />;
+  }
+
+  return (
+    <div className="p-8 bg-slate-50 min-h-screen">
+      {/* Loading Overlay - Sticky at top */}
+      {isLoading && (
+        <div className="fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl mt-4">
+          <div className="mx-4 p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-lg backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <p className="text-sm font-medium text-blue-800">Loading queue...</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* White Container - Like DataTable */}
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        {/* Header - Compact */}
+        <div className="px-6 py-5 border-b border-slate-100">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-[26px] font-extrabold text-slate-900 tracking-tight leading-none mb-1">Doctor Console</h1>
+              <p className="text-[15px] font-medium text-slate-600">Patient Queue Management</p>
+            </div>
+            <div className="flex items-center gap-3">
+              {/* Mini Stats - Inline */}
+              <div className="flex items-center gap-4 px-4 py-2 bg-slate-50 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-xs font-black text-slate-600">{queueData.pending}</span>
+                  <span className="text-xs text-slate-400">Queue</span>
+                </div>
+                <div className="w-px h-4 bg-slate-300"></div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-black text-slate-600">{queueData.inProgress}</span>
+                  <span className="text-xs text-slate-400">Active</span>
+                </div>
+                <div className="w-px h-4 bg-slate-300"></div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                  <span className="text-xs font-black text-slate-600">{queueData.completed}</span>
+                  <span className="text-xs text-slate-400">Done</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={loadQueue}
+                className="p-2 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-all"
+              >
+                <RefreshCw className="w-4 h-4 text-slate-600" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Tabs - Compact */}
+        <div className="px-6 py-3 border-b border-slate-100 bg-white">
+          <div className="bg-slate-50 rounded-lg p-1 inline-flex gap-1">
+            <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>All</FilterButton>
+            <FilterButton active={filter === 'pending'} onClick={() => setFilter('pending')}>Pending</FilterButton>
+            <FilterButton active={filter === 'urgent'} onClick={() => setFilter('urgent')}>Urgent</FilterButton>
+          </div>
+        </div>
+
+        {/* Patient Queue Grid - More cards visible */}
+        <div className="p-6">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className={theme.body}>Loading queue...</p>
+              </div>
+            </div>
+          ) : filteredPatients.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {filteredPatients.map((patient, index) => (
+                <PatientCard 
+                  key={patient.id} 
+                  patient={patient} 
+                  index={index}
+                  onClick={() => {
+                    setSelectedPatient(patient);
+                    setView('detail');
+                  }}
+                  onStatusUpdate={handleStatusUpdate}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="p-20 text-center">
+              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-10 h-10 text-slate-400" />
+              </div>
+              <h3 className={theme.h2 + " mb-2"}>All Clear!</h3>
+              <p className={theme.body}>No patients in the queue right now.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Stat Card Component
+function StatCard({ label, value, icon: Icon, color }) {
+  const colorClasses = {
+    blue: "bg-blue-500",
+    amber: "bg-amber-500",
+    emerald: "bg-emerald-500"
   };
 
   return (
-   <div className="p-8 bg-slate-50 min-h-screen">
-  
-        {/* Error Display */}
-        {error && (
-          <div className="fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl mt-4">
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full"></div>
-              <p className="text-sm font-medium text-red-800">{error}</p>
+    <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 hover:shadow-sm transition-all">
+      <div className="flex items-start justify-between mb-4">
+        <div className={`p-3 ${colorClasses[color]} rounded-xl`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+        <span className="text-3xl font-black text-slate-900">{value}</span>
+      </div>
+      <h3 className={theme.label}>{label}</h3>
+    </div>
+  );
+}
+
+// Filter Button - Smaller
+function FilterButton({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+        active ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Patient Card Component - Compact
+function PatientCard({ patient, index, onClick, onStatusUpdate }) {
+  const isPriority = patient.priority === 'urgent';
+
+  return (
+    <div 
+      className={`${isPriority ? 'border-2 border-red-500 bg-red-50' : 'bg-slate-50 border border-slate-100'} rounded-lg p-4 cursor-pointer hover:shadow-md transition-all animate-slideIn`}
+      style={{ animationDelay: `${index * 30}ms` }}
+      onClick={onClick}
+    >
+      {/* Header - Compact */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2 py-0.5 bg-slate-900 text-white text-xs font-black rounded">
+              #{patient.tokenNo}
+            </span>
+            {isPriority && (
+              <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-black rounded">!</span>
+            )}
+          </div>
+          <h3 className="text-base font-black text-slate-900 truncate">{patient.fullName}</h3>
+          <p className="text-xs text-slate-500">{patient.age}y • {patient.gender}</p>
+        </div>
+        <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+      </div>
+
+      {/* Info - Compact */}
+      <div className="space-y-1.5 mb-3">
+        <div className="flex items-center gap-1.5 text-xs text-slate-600">
+          <Clock className="w-3 h-3" />
+          <span>{patient.registrationTime}</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-slate-600">
+          <Stethoscope className="w-3 h-3" />
+          <span className="truncate">{patient.appointmentType}</span>
+        </div>
+      </div>
+
+      {/* Actions - Compact */}
+      <div className="flex gap-2">
+        <button
+          onClick={(e) => { e.stopPropagation(); onStatusUpdate(patient.id, 'in-progress'); }}
+          className="flex-1 py-1.5 bg-indigo-500 text-white text-xs font-bold rounded-lg hover:bg-indigo-600 transition-all"
+        >
+          Start
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onStatusUpdate(patient.id, 'hold'); }}
+          className="px-2.5 py-1.5 border-2 border-slate-200 text-slate-600 rounded-lg hover:bg-white transition-all"
+        >
+          <Pause className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Info Row Helper
+function InfoRow({ icon: Icon, text }) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <Icon className="w-4 h-4 text-slate-400" />
+      <span className="font-medium text-slate-600">{text}</span>
+    </div>
+  );
+}
+
+// Patient Detail View
+function PatientDetailView({ patient, onBack, onStatusUpdate }) {
+  const [notes, setNotes] = useState('');
+
+  return (
+    <div className={theme.page}>
+      {/* Fixed Header */}
+      <div className="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm mb-6">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-xl transition-all">
+                <ArrowLeft className="w-6 h-6 text-slate-600" />
+              </button>
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="px-2.5 py-1 bg-slate-900 text-white text-xs font-black rounded-md">
+                    #{patient.tokenNo}
+                  </span>
+                  <h1 className="text-[26px] font-extrabold text-slate-900 tracking-tight">{patient.fullName}</h1>
+                </div>
+                <p className="text-[15px] font-medium text-slate-600">{patient.age}y • {patient.gender} • {patient.appointmentType}</p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button onClick={() => onStatusUpdate(patient.id, 'hold')} className={theme.btnWarning}>
+                <div className="flex items-center gap-2">
+                  <Pause className="w-5 h-5" />
+                  Hold
+                </div>
+              </button>
+              <button onClick={() => onStatusUpdate(patient.id, 'completed')} className={theme.btnSuccess}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5" />
+                  Mark Complete
+                </div>
+              </button>
             </div>
           </div>
-          </div>
-        )}
-  
-        {/* Loading Overlay - Sticky at top */}
-        {isLoading && (
-          <div className="fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl mt-4">
-            <div className="mx-4 p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-lg backdrop-blur-sm">
-              <div className="flex items-center gap-3">
-                <div className="flex-shrink-0">
-                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-                <p className="text-sm font-medium text-blue-800">Loading visit history...</p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Vitals */}
+            <div className={`${theme.card} p-6`}>
+              <h3 className={theme.h2 + " mb-4 flex items-center gap-2"}>
+                <Activity className="w-5 h-5 text-indigo-500" />
+                Vitals
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <VitalItem label="BP" value={patient.vitals.bp} />
+                <VitalItem label="Pulse" value={patient.vitals.pulse} />
+                <VitalItem label="Temp" value={patient.vitals.temp} />
+                <VitalItem label="Weight" value={patient.vitals.weight} />
+              </div>
+            </div>
+
+            {/* Contact & Allergies */}
+            <div className={`${theme.card} p-6`}>
+              <h3 className={theme.h2 + " mb-4"}>Contact & Alerts</h3>
+              <div className="space-y-3">
+                <InfoRow icon={Phone} text={patient.phone} />
+                {patient.allergies.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+                    <div className="flex items-center gap-2 text-red-700 mb-1">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className={theme.label + " text-red-700"}>Allergies</span>
+                    </div>
+                    <p className="text-sm font-bold text-red-900">{patient.allergies.join(', ')}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        )}
-  
-        <DataTable
-          title="Dcotor Screen"
-          description="Search & view Patient Data"
-          rows={visitData.rows}
-          columns={columns}
-          pageSize={15}
-          serverSide={true}
-          serverTotalCount={visitData.total}
-          onServerStateChange={fetchData}
-          
-          onRowClick={(row) => {
-      
-          }}
-          onActionClick={(row) => {
-      
-          }}
-          onFilterClick={() => {
-      
-          }}
-          
-          enableSearch={true}
-          enablePagination={true}
-          enableSorting={true}
-          showActions={true}
-          
-          customTheme={{
-            heading: "text-[26px] font-extrabold text-slate-900 tracking-tight",
-            subheading: "text-[15px] font-medium text-slate-600",
-          }}
-        />
+
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Chief Complaint */}
+            <div className="bg-indigo-500 rounded-2xl p-6 text-white shadow-sm">
+              <h3 className="text-sm font-black uppercase tracking-wider mb-2 opacity-90">Chief Complaint</h3>
+              <p className="text-xl font-bold">{patient.chiefComplaint}</p>
+            </div>
+
+            {/* Previous Visits */}
+            <div className={`${theme.card} p-6`}>
+              <h3 className={theme.h2 + " mb-4 flex items-center gap-2"}>
+                <History className="w-5 h-5 text-indigo-500" />
+                Previous Visits
+              </h3>
+              {patient.previousVisits.length > 0 ? (
+                <div className="space-y-3">
+                  {patient.previousVisits.map((visit, i) => (
+                    <div key={i} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={theme.label}>{visit.date}</span>
+                        <span className="text-xs font-bold text-indigo-600">{visit.diagnosis}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Pill className="w-4 h-4 text-slate-400" />
+                        <span className="font-medium text-slate-700">{visit.medicines.join(', ')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-center py-8">No previous visits</p>
+              )}
+            </div>
+
+            {/* Clinical Notes */}
+            <div className={`${theme.card} p-6`}>
+              <h3 className={theme.h2 + " mb-4 flex items-center gap-2"}>
+                <FileText className="w-5 h-5 text-indigo-500" />
+                Clinical Notes
+              </h3>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Enter diagnosis, prescriptions, and treatment notes..."
+                className={theme.input + " h-40 resize-none"}
+              />
+              <button className={theme.btnPrimary + " w-full mt-3"}>Save Notes</button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideIn {
+          animation: slideIn 0.3s ease-out forwards;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// Vital Item
+function VitalItem({ label, value }) {
+  return (
+    <div className="bg-slate-50 rounded-xl p-3">
+      <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">{label}</p>
+      <p className="text-lg font-black text-slate-900">{value}</p>
+    </div>
   );
 }
