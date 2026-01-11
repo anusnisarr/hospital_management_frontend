@@ -142,7 +142,7 @@ export default function DoctorKDSScreen() {
     }
   );
 
-    updateVisit({visitId, newStatus})
+    updateVisit( visitId ,{status:newStatus })
 
     setQueueData(prev => ({
       ...prev,

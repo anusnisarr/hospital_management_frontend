@@ -50,11 +50,11 @@ export const createVisit = async (payload) => {
  
 }
 
-export const updateVisit = async (payload) => {
+export const updateVisit = async (id, payload) => {
 
-    console.log(payload);
+    console.log(id, payload);
 
-    const res = await API.patch("/visit/updateVisitDetails" , payload );    
+    const res = await API.patch(`/visit/updateVisitDetails/${id}` , { fields:payload } );
     return res.data
  
 }
