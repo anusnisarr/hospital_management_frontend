@@ -27,7 +27,7 @@ const PatientRegistration = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [extraFieldsOpen, setExtraFieldsOpen] = useState(false);
 
-  const patientsWaiting = todayVisits?.filter((patient) => patient.status === "waiting");
+  const patientsWaiting = todayVisits?.filter((patient) => patient.status === "pending");
 
   const [showTokenReceipt, setShowTokenReceipt] = useState({
     isOpen: false,
@@ -58,7 +58,7 @@ const PatientRegistration = () => {
       hour12: true,
     }),
     registrationDate: new Date().toISOString(),
-    status: "waiting",
+    status: "pending",
     appointmentType: "General Consultation",
     priority: "Normal",
   });

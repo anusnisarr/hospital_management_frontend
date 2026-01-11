@@ -49,3 +49,12 @@ export const createVisit = async (payload) => {
     return res.data
  
 }
+
+export const updateVisit = async (payload) => {
+
+    console.log(payload);
+
+    const res = await API.patch("/visit/updateVisitDetails" , payload );    
+    return res.data
+ 
+}
