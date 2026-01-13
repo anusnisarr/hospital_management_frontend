@@ -71,12 +71,14 @@ const PatientRegistration = () => {
   }, []);
 
   socket.on("status-updated", (data) => {
-    setTodayVisits((prevPatients) =>
-      prevPatients.map((patient) => {
-        if (patient._id === data.patientId) {
-          return { ...patient, status: data.newStatus };
+    console.log("status-updated" , data);
+    
+    setTodayVisits((prevVisits) =>
+      prevVisits.map((visit) => {
+        if (visit._id === data.visitId) {
+          return { ...visit, status: data.newStatus };
         }
-        return patient;
+        return visit;
       })
     );
   });
