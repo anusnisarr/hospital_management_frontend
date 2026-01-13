@@ -23,7 +23,7 @@ export default function PatientList() {
 
     try {
 
-        const data = await getPatient(search , page + 1, pageSize, columnFields, sort );
+        const data = await getPatient(search , page, pageSize, columnFields, sort );
         if (requestIdRef.current !== requestId) return;
 
         setPatentData({ rows: data.data, total: data.total });
