@@ -27,7 +27,10 @@ const PatientRegistration = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [extraFieldsOpen, setExtraFieldsOpen] = useState(false);
 
-  const patientsWaiting = todayVisits?.filter((patient) => patient.status === "pending");
+  const patientsPending = todayVisits?.filter((patient) => patient.status === "Pending");
+  const patientsInConsultation = todayVisits?.filter((patient) => patient.status === "In Consultation");
+  const patientsOnHold = todayVisits?.filter((patient) => patient.status === "Hold");
+  const patientsCompleted = todayVisits?.filter((patient) => patient.status === "Completed");
 
   const [showTokenReceipt, setShowTokenReceipt] = useState({
     isOpen: false,
@@ -58,7 +61,7 @@ const PatientRegistration = () => {
       hour12: true,
     }),
     registrationDate: new Date().toISOString(),
-    status: "pending",
+    status: "Pending",
     appointmentType: "General Consultation",
     priority: "Normal",
   });
@@ -318,7 +321,7 @@ const PatientRegistration = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
           <div className="rounded-xl p-4 shadow-sm bg-blue-50 border border-blue-100 flex flex-col justify-between">
             <h3 className="text-3xl font-semibold text-blue-900">
-              {todayVisits?.length || "-"}
+              {todayVisits?.length || "0"}
             </h3>
             <p className="text-sm text-blue-700 mt-2">
               Total Patients Registered
@@ -326,25 +329,25 @@ const PatientRegistration = () => {
           </div>
 
           <div className="rounded-xl p-4 shadow-sm bg-yellow-50 border border-yellow-100 flex flex-col justify-between">
-            <h3 className="text-3xl font-semibold text-yellow-900">{patientsWaiting?.length || '-'}</h3>
+            <h3 className="text-3xl font-semibold text-yellow-900">{patientsPending?.length || '0'}</h3>
             <p className="text-sm text-yellow-700 mt-2">Patients Waiting</p>
           </div>
 
           <div className="rounded-xl p-4 shadow-sm bg-purple-50 border border-purple-100 flex flex-col justify-between">
-            <h3 className="text-3xl font-semibold text-purple-900">-</h3>
+            <h3 className="text-3xl font-semibold text-purple-900">{patientsInConsultation?.length || '0'}</h3>
             <p className="text-sm text-purple-700 mt-2">In Consultation</p>
           </div>
 
           <div className="rounded-xl p-4 shadow-sm bg-green-50 border border-green-100 flex flex-col justify-between">
-            <h3 className="text-3xl font-semibold text-green-900">-</h3>
+            <h3 className="text-3xl font-semibold text-green-900">{patientsCompleted?.length || '0'}</h3>
             <p className="text-sm text-green-700 mt-2">
               Completed / Checked Out
             </p>
           </div>
 
           <div className="rounded-xl p-4 shadow-sm bg-red-50 border border-red-100 flex flex-col justify-between">
-            <h3 className="text-3xl font-semibold text-red-900">-</h3>
-            <p className="text-sm text-red-700 mt-2">No-Show / Cancelled</p>
+            <h3 className="text-3xl font-semibold text-red-900">{patientsOnHold?.length || '0'}</h3>
+            <p className="text-sm text-red-700 mt-2">No-Show / Hold</p>
           </div>
         </div>
 
@@ -382,6 +385,7 @@ const PatientRegistration = () => {
 
               {/* Personal Information */}
               <div className="space-y-4">
+                
                 {/* Email + Phone */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="relative">
@@ -449,6 +453,7 @@ const PatientRegistration = () => {
                   />
                 </div>
 
+                {/* Name + Age */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <TextInputField
                     labelText="Full Name *"
@@ -484,6 +489,47 @@ const PatientRegistration = () => {
                     }
                   />
                 </div>
+
+                {/* Appointment */}
+                  <div className="mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Appointment Type
+                        </label>
+                        <select
+                          name="appointmentType"
+                          value={patientData.appointmentType}
+                          onChange={handleInputChange}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="General Consultation">
+                            General Consultation
+                          </option>
+                          <option value="Follow-up">Follow-up</option>
+                          <option value="Emergency">Emergency</option>
+                          <option value="Health Checkup">Health Checkup</option>
+                          <option value="Vaccination">Vaccination</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Priority
+                        </label>
+                        <select
+                          name="priority"
+                          value={patientData.priority}
+                          onChange={handleInputChange}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="Normal">Normal</option>
+                          <option value="Urgent">Urgent</option>
+                          <option value="Emergency">Emergency</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
                 {/* show more fields button */}
                 <button
@@ -572,47 +618,6 @@ const PatientRegistration = () => {
                       placeholder="Enter Emergency Contact Phone"
                     />
 
-                  </div>
-
-                  {/* Appointment */}
-                  <div className="mt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Appointment Type
-                        </label>
-                        <select
-                          name="appointmentType"
-                          value={patientData.appointmentType}
-                          onChange={handleInputChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="General Consultation">
-                            General Consultation
-                          </option>
-                          <option value="Follow-up">Follow-up</option>
-                          <option value="Emergency">Emergency</option>
-                          <option value="Health Checkup">Health Checkup</option>
-                          <option value="Vaccination">Vaccination</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Priority
-                        </label>
-                        <select
-                          name="priority"
-                          value={patientData.priority}
-                          onChange={handleInputChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="normal">Normal</option>
-                          <option value="urgent">Urgent</option>
-                          <option value="emergency">Emergency</option>
-                        </select>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -715,7 +720,10 @@ const PatientRegistration = () => {
 
                   <div className="flex justify-between">
                     <div className="text-xs text-gray-500 mt-1">
-                      {visit?.appointmentType} • {visit?.registrationTime}
+                      {visit?.appointmentType} • {new Date(visit?.registrationDate).toLocaleTimeString(`un-PK`, {
+                        timeStyle: "short",
+                        hour12: true,
+                      })}
                     </div>
                       <div className="text-sm text-gray-700">
                         {visit.patient?.phone} 

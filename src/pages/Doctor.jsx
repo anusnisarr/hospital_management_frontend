@@ -320,7 +320,7 @@ function FilterButton({ active, onClick, children }) {
 
 // Patient Card Component - Compact
 function PatientCard({ visit, index, onClick, onStatusUpdate }) {
-  const isPriority = visit.priority === 'urgent';
+  const isPriority = visit.priority === 'Urgent';
   
   return (
     <div 
@@ -334,6 +334,9 @@ function PatientCard({ visit, index, onClick, onStatusUpdate }) {
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2 py-0.5 bg-slate-900 text-white text-xs font-black rounded">
               #{visit.tokenNo}
+            </span>
+            <span className="px-2 py-0.5 bg-slate-900 text-white text-xs font-black rounded">
+              {visit.status}
             </span>
             {isPriority && (
               <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-black rounded">!</span>
@@ -360,13 +363,13 @@ function PatientCard({ visit, index, onClick, onStatusUpdate }) {
       {/* Actions - Compact */}
       <div className="flex gap-2">
         <button
-          onClick={(e) => { e.stopPropagation(); onStatusUpdate(visit._id, 'in-progress'); }}
+          onClick={(e) => { e.stopPropagation(); onStatusUpdate(visit._id, 'In Consultation'); }}
           className="flex-1 py-1.5 bg-indigo-500 text-white text-xs font-bold rounded-lg hover:bg-indigo-600 transition-all"
         >
           Start
         </button>
         <button
-          onClick={(e) => { e.stopPropagation(); onStatusUpdate(visit._id, 'hold'); }}
+          onClick={(e) => { e.stopPropagation(); onStatusUpdate(visit._id, 'Hold'); }}
           className="px-2.5 py-1.5 border-2 border-slate-200 text-slate-600 rounded-lg hover:bg-white transition-all"
         >
           <Pause className="w-3.5 h-3.5" />
@@ -419,7 +422,7 @@ function PatientDetailView({ visit, onBack, onStatusUpdate }) {
                   Hold
                 </div>
               </button>
-              <button onClick={() => onStatusUpdate(visit._id, 'completed')} className={theme.btnSuccess}>
+              <button onClick={() => onStatusUpdate(visit._id, 'Completed')} className={theme.btnSuccess}>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5" />
                   Mark Complete
