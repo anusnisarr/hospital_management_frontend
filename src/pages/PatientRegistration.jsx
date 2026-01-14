@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 // import PatientFileModal from "./PatientModal";
-import { getAllTodayVisits , createNewVisitAndPatient , createVisit } from "../api/services/visitService.js";
-import { getPatientByPhone, updatedPatientDetails } from "../api/services/patientService.js";
+import { getAllTodayVisits , registerPatientAndCreateVisit, updatePatientAndCreateVisit, createVisit } from "../api/services/visitService.js";
+import { getPatientByPhone, updatePatientDetails } from "../api/services/patientService.js";
 import TokenReceipt from "../components/TokenReceiptViewer.jsx";
 import { socket } from "../socket.js";
 import {
@@ -213,11 +213,16 @@ const PatientRegistration = () => {
 
     if (editPatientId) {
 
-      const payload = { id:editPatientId , patientData }
+      const payload = { patientId:editPatientId, patientData, visitData: { ...visitData, tokenNo: currentToken } }
+      
       try {
-        const updatedPatient = await updatedPatientDetails(payload)
-        setShowMessage("Patient Updated Successfully!")
+        const updatedPatient = await updatePatientAndCreateVisit(payload)
 
+        setShowTokenReceipt({ isOpen: true, receiptData: updatedPatient });
+        setTodayVisits((prev) => [...prev, updatedPatient]);
+        setShowMessage(`Patient updated successfully with token #${updatedPatient.tokenNo}`);
+        setTimeout(() => setShowMessage(null), 3000);
+        
       } catch (error) {
         console.error("❌ Error:", error.response?.data || error.message);
         setShowMessage(null)
@@ -230,7 +235,7 @@ const PatientRegistration = () => {
           visitData: { ...visitData, tokenNo: currentToken }
         };
 
-        const PatientVisit = await createNewVisitAndPatient(payload);
+        const PatientVisit = await registerPatientAndCreateVisit(payload);
 
         setShowTokenReceipt({ isOpen: true, receiptData: PatientVisit });
         setTodayVisits((prev) => [...prev, PatientVisit]);

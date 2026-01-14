@@ -36,9 +36,16 @@ export const getTodayVisits = async (search , page , pageSize , columnFields, so
  
 }
 
-export const createNewVisitAndPatient = async (payload) => {
+export const registerPatientAndCreateVisit = async (payload) => {
 
-    const res = await API.post("/visit/registerPatientAndVisit" , payload );    
+    const res = await API.post("/visit/registerPatientAndCreateVisit" , payload );    
+    return res.data
+ 
+}
+
+export const updatePatientAndCreateVisit = async (payload) => {
+
+    const res = await API.post("/visit/updatePatientAndCreateVisit" , payload );    
     return res.data
  
 }

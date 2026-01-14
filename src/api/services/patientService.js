@@ -21,10 +21,7 @@ export const getPatientByPhone = async ( phone ) => {
     
 }
 
-export const updatedPatientDetails = async ( payload ) => {
-
-    console.log("updatedPatientData" , payload );
-    
+export const updatePatientDetails = async ( payload ) => {
 
     const res = await API.patch(`/patient/update/${payload.id}` ,  {patientData : payload.patientData} );
     return res.data
