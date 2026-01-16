@@ -14,14 +14,16 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const BASE_URL = import.meta.env.VITE_BASE_PATH;
-  
+    
   const refreshAccessToken = useCallback(async () => {
+
     try {
       const res = await axios.post(
         `${BASE_URL}/auth/refresh`,
         {},
         { withCredentials: true }
       );
+      
       AuthStore.setAccessToken(res.data.accessToken);
       setAccessToken(res.data.accessToken);
       setUser(res.data.user);
@@ -45,6 +47,7 @@ export function AuthProvider({ children }) {
       return;
     }
 
+
     if (PUBLIC_ROUTES.includes(location.pathname)) {
       setLoading(false);
       return;
@@ -53,7 +56,7 @@ export function AuthProvider({ children }) {
     refreshAccessToken();
   }, [accessToken , navigate ,  location.pathname , refreshAccessToken]);
 
-  if (loading) return null; // or a loader component
+  if (loading) return null;
   
   return (
     <AuthContext.Provider value={{ accessToken, user, setAccessToken, setUser }}>
