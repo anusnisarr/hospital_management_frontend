@@ -2,6 +2,7 @@ import { createContext, useState, useEffect, useCallback, useContext } from "rea
 import axios from "axios";
 import { useNavigate , useLocation } from "react-router-dom";
 import { AuthStore } from "../store/AuthStore"
+import { getNewAccessToken } from "../api/services/AuthService";
 
 const PUBLIC_ROUTES = ["/login", "/signup"];
 export const AuthContext = createContext();
@@ -18,15 +19,11 @@ export function AuthProvider({ children }) {
   const refreshAccessToken = useCallback(async () => {
 
     try {
-      const res = await axios.post(
-        `${BASE_URL}/auth/refresh`,
-        {},
-        { withCredentials: true }
-      );
-      
-      AuthStore.setAccessToken(res.data.accessToken);
-      setAccessToken(res.data.accessToken);
-      setUser(res.data.user);
+      const res = await getNewAccessToken();
+
+      AuthStore.setAccessToken(res.accessToken);
+      setAccessToken(res.accessToken);
+      setUser(res.user);
 
     } catch (err) {    
       setAccessToken(null);

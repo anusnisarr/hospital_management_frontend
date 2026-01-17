@@ -1,18 +1,27 @@
 import './App.css';
-import {Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import {Routes, Route ,useNavigate } from 'react-router-dom';
+import { setNavigate } from './navigationService';
+import ProtectedRoute from './components/ProtectedRoute';
+
 import Layout from './components/Layout';
+import SignUp from './pages/SignUp';
+import Login from './pages/login';
 import PatientRegistration from './pages/PatientRegistration';
 import DoctorScreen from './pages/Doctor';
 import VisitHistory from './pages/VisitHistory';
 import PatientList from './pages/PatientList';
-import Login from './pages/login';
-import SignUp from './pages/SignUp';
 import { DataTableGuide } from './pages/Guide';
-import ProtectedRoute from './components/ProtectedRoute';
-
 
 
 const App = () => {
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        setNavigate(navigate);
+    }, [navigate]);
+
     return (
         
                 <Routes>
