@@ -181,7 +181,7 @@ export default function DoctorKDSScreen() {
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
       {/* Loading Overlay - Sticky at top */}
-      {isLoading && (
+      {/* {isLoading && (
         <div className="fixed top-0 left-0 right-0 z-50 mx-auto max-w-2xl mt-4">
           <div className="mx-4 p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-lg backdrop-blur-sm">
             <div className="flex items-center gap-3">
@@ -192,7 +192,7 @@ export default function DoctorKDSScreen() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* White Container - Like DataTable */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">

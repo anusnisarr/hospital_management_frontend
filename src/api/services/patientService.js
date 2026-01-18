@@ -28,3 +28,12 @@ export const updatePatientDetails = async ( payload ) => {
     
 }
 
+
+export const getPatientWithHistory = async (patientId) => {
+
+    const response = await API.get(`/patient/${patientId}/history`);
+    return {
+      patient: response.data.data,
+      success: true
+    };
+};

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+
 // import PatientFileModal from "./PatientModal";
 import {
   getAllTodayVisits,
@@ -13,18 +14,12 @@ import {
 import TokenReceipt from "../components/TokenReceiptViewer.jsx";
 import { socket } from "../socket.js";
 import {
-  CalendarDays,
   User,
-  Calendar,
-  Phone,
-  Mail,
-  MapPin,
   Hash,
   Clock,
   UserPlus,
 } from "lucide-react";
-import { TextInputField } from "../components/inputFields.jsx";
-const env = import.meta.env;
+import { TextInputField } from "../components/InputFields.jsx";
 
 const PatientRegistration = () => {
   const [editPatientId, setEditPatientId] = useState("");

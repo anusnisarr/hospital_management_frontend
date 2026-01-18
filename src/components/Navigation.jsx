@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, Navigate , NavLink } from 'react-router-dom';
+import UserAccountButton from './userAccountButton.jsx';
 
 import { 
   Database, 
@@ -20,6 +21,7 @@ import {
 export default function Navigation() {
 
   const [isCollapsed, setIsCollapsed] = useState(true);
+
   const navigationItems = [
     { icon: Database, label: 'Patient', to:"/Patients" },
     { icon: FileText, label: 'Doctor Screen', to:"/DoctorScreen" },
@@ -109,20 +111,7 @@ export default function Navigation() {
         
         
         {/* Account */}
-        <div 
-          className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2 rounded-lg cursor-pointer text-gray-700 hover:bg-gray-50 mt-2 group relative`}
-          title={isCollapsed ? 'Account name' : ''}
-        >
-          <div className="w-5 h-5 bg-orange-400 rounded-full flex-shrink-0"></div>
-          {!isCollapsed && <span className="text-sm">Account name</span>}
-          
-          {/* Tooltip for collapsed state */}
-          {isCollapsed && (
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-              Account name
-            </div>
-          )}
-        </div>
+        <UserAccountButton isCollapsed={isCollapsed} />
       </div>
       
       {/* Toggle Button - Centered on right edge */}

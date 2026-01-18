@@ -22,6 +22,7 @@ export function AuthProvider({ children }) {
       const res = await getNewAccessToken();
 
       AuthStore.setAccessToken(res.accessToken);
+      AuthStore.setUser(res.user);
       setAccessToken(res.accessToken);
       setUser(res.user);
 
@@ -29,6 +30,7 @@ export function AuthProvider({ children }) {
       setAccessToken(null);
       setUser(null);
       AuthStore.clearAccessToken();
+      AuthStore.clearUser();
       if (!PUBLIC_ROUTES.includes(location.pathname)) {
         navigate("/login", { replace: true });
       }

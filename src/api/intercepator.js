@@ -2,15 +2,24 @@
 
 import API from "./ApiInstance";
 import { AuthStore } from "../store/AuthStore"
-import axios from "axios";
-import { navigateToLogin } from "../navigationService";
 import { getNewAccessToken } from "../api/services/AuthService";
 
 let isRefreshing = false;
 let failedQueue = [];
 
+const AUTH_EXCLUDED_ROUTES = [
+  "/auth/login",
+  "/auth/refresh",
+  "/auth/logout",
+];
+
 API.interceptors.request.use((config) => {
   const token = AuthStore.getAccessToken();
+  const url = config.url || "";
+
+  if (AUTH_EXCLUDED_ROUTES.some((route) => url.includes(route))) {
+    return config;
+  }
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -32,6 +41,10 @@ API.interceptors.response.use(
   res => res,
   async error => {
     const originalRequest = error.config;
+
+    if (error.name === "CanceledError") {
+      return Promise.reject(error);
+    }
 
     if (
       error.response?.status === 401 &&
@@ -62,8 +75,7 @@ API.interceptors.response.use(
         return API(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        AuthStore.clearAccessToken();
-        navigateToLogin();
+        logout("REFRESH_FAILED")
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
@@ -76,9 +88,8 @@ API.interceptors.response.use(
         error.response.data?.code
       )
     ) {
-      AuthStore.clearAccessToken();
-      navigateToLogin();
-    }
+      logout("REFRESH_TOKEN_EXPIRED or MISSING");
+    };
 
     return Promise.reject(error);
   }

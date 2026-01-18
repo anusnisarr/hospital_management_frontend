@@ -6,13 +6,15 @@ import { Link } from 'react-router-dom';
 import clsx from "clsx"; // optional: for conditional classnames
 const env = import.meta.env
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from "../context/AuthProvider";
+import { AuthStore } from "../store/AuthStore";
 
 // simple axios helper (replace baseURL with your env var)
 const API = axios.create({ baseURL: `${env.VITE_BASE_PATH}/auth` || "" });
 
 export default function Login({ onSuccess }) {
-  const { setAccessToken , setUser } = useContext(AuthContext)
+  
+  const setAccessToken = AuthStore.setAccessToken;
+  const setUser = AuthStore.setUser;
   const [form, setForm] = useState({ email: "", password: "", remember: false });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});

@@ -2,19 +2,19 @@ import { Navigate, Outlet } from "react-router-dom";
 import { AuthStore } from "../store/AuthStore";
 import SplashScreen from "./SplashScreen";
 
-const ProtectedRoute = () => {
-  
-    const authStatus = AuthStore.getAuthStatus();
+const PublicRoute = () => {
+
+  const authStatus = AuthStore.getAuthStatus();
 
   if (authStatus === "unknown") {
     return <SplashScreen />;
   }
 
-  if (authStatus !== "authenticated") {
-    return <Navigate to="/login" replace />;
+  if (authStatus === "authenticated") {
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

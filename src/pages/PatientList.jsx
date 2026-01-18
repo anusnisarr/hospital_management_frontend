@@ -1,12 +1,14 @@
 import { useState, useCallback, useRef } from 'react';
 import { usePatientColumns , columnFields } from '../constants/patientColumns'
 import { getPatient } from "../api/services/patientService";
-import DataTable from '../components/dataTable';
+import DataTable from '../components/DataTable';
+import { useNavigate } from 'react-router-dom';
 
 export default function PatientList() {
   const [patientData, setPatentData] = useState({ rows: [], total: 0 });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const requestIdRef = useRef(null);
 
@@ -42,7 +44,6 @@ export default function PatientList() {
     }
   }, []);
   
- 
    return (
     <div className="p-8 bg-slate-50 min-h-screen">
 
@@ -82,7 +83,7 @@ export default function PatientList() {
         onServerStateChange={fetchData}
         
         onRowClick={(row) => {
-    
+          navigate(`/patient/${row.id || row._id}`);
         }}
         onActionClick={(row) => {
     
@@ -104,3 +105,6 @@ export default function PatientList() {
     </div>
   );
 }
+
+
+
