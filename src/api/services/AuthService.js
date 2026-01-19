@@ -1,7 +1,7 @@
 import authAPI from "../authApiInstance";
 import { resetApiSession } from "../authApiInstance";
 import { AuthStore } from "../../store/AuthStore";
-import { navigateToLogin } from "../../navigation/NavigationService";
+import { navigateToLogin } from "../../navigation/NavigationService"; 
 
 export const getNewAccessToken = async () => {
 
