@@ -1,10 +1,10 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import {Routes, Route ,useNavigate } from 'react-router-dom';
-import { setNavigate } from './navigation/navigationService.js';
-import PublicRoute from './components/publicRoute.jsx';
+import { setNavigate } from './navigation/NavigationService.js';
+import PublicRoute from './components/PublicRoute.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
-import BootstrapAuth from './components/bootstrapAuth.jsx';
+import BootstrapAuth from './components/BootstrapAuth.jsx';
 import SplashScreen from './components/SplashScreen.jsx';
 
 import Layout from './components/Layout';
