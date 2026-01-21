@@ -1,11 +1,12 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import {Routes, Route ,useNavigate } from 'react-router-dom';
-import { setNavigate } from './navigation/NavigationService.js';
 import PublicRoute from './components/PublicRoute.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
 import BootstrapAuth from './components/BootstrapAuth.jsx';
 import SplashScreen from './components/SplashScreen.jsx';
+import { setNavigate } from './navigation/NavigationService.js';
+import { TenantRegister } from './pages/TenantRegister.jsx';
 
 import Layout from './components/Layout';
 import SignUp from './pages/SignUp';
@@ -39,6 +40,7 @@ const App = () => {
         
                 <Routes>
                     <Route element={<PublicRoute />}>
+                        <Route path="TenantRegister" element={<TenantRegister />} />
                         <Route path="Login" element={<Login />} />
                         <Route path="signup" element={<SignUp />} />
                     </Route>

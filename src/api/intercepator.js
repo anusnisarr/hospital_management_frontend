@@ -8,8 +8,9 @@ let isRefreshing = false;
 let failedQueue = [];
 
 const AUTH_EXCLUDED_ROUTES = [
-  "/auth/login",
   "/auth/refresh",
+  "/auth/login",
+  "/auth/TenantRegister",
   "/auth/logout",
 ];
 

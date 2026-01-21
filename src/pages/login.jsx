@@ -1,22 +1,22 @@
 // Login.jsx
-import { useState , useContext } from "react";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useState, useContext } from "react";
+import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
 import axios from "axios";
 import { Link } from 'react-router-dom';
 import clsx from "clsx"; // optional: for conditional classnames
 const env = import.meta.env
 import { useNavigate } from 'react-router-dom';
 import { AuthStore } from "../store/AuthStore";
+import { InputField } from '../components/inputFields';
 
 // simple axios helper (replace baseURL with your env var)
 const API = axios.create({ baseURL: `${env.VITE_BASE_PATH}/auth` || "" });
 
 export default function Login({ onSuccess }) {
-  
+
   const setAccessToken = AuthStore.setAccessToken;
   const setUser = AuthStore.setUser;
   const [form, setForm] = useState({ email: "", password: "", remember: false });
-  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
@@ -33,6 +33,22 @@ export default function Login({ onSuccess }) {
     return Object.keys(e).length === 0;
   };
 
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setForm((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  if (errors[name]) {
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  }
+};
+
   const handleSubmit = async (ev) => {
     ev?.preventDefault();
     setServerError("");
@@ -46,12 +62,14 @@ export default function Login({ onSuccess }) {
         password: form.password,
         remember: form.remember
       }, {
-        withCredentials: true 
+        withCredentials: true
       });
 
-      setAccessToken(res.data.accessToken)      
-      setUser(res.data.user)     
-    
+      setAccessToken(res.data.accessToken)
+      console.log(res.data.user);
+      
+      setUser(res.data.user)
+
       onSuccess?.(res.data);
       navigate("/", { replace: true });
     } catch (err) {
@@ -62,96 +80,94 @@ export default function Login({ onSuccess }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="w-full max-w-md bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-          <p className="text-sm text-gray-500 mt-1">Sign in to access the clinic dashboard</p>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+      <div className="w-full max-w-md">
+
+        <div className="text-center mb-8">
+          <h1 className="text-[32px] font-extrabold text-slate-900 tracking-tight mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-[15px] font-medium text-slate-600">
+            Sign in to your clinic dashboard
+          </p>
         </div>
 
-        {serverError && (
-          <div className="mb-4 text-sm text-red-700 bg-red-50 border border-red-100 p-3 rounded-md">{serverError}</div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block">
-            <span className="text-sm text-gray-600">Email</span>
-            <div className={clsx(
-              "mt-1 relative rounded-lg border px-3 py-2 flex items-center",
-              errors.email ? "border-red-300 bg-red-50" : "border-gray-200 bg-white"
-            )}>
-              <Mail className="h-4 w-4 text-gray-400 mr-2" />
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => { setForm({ ...form, email: e.target.value }); if (errors.email) setErrors(prev => ({ ...prev, email: "" })); }}
-                placeholder="you@clinic.com"
-                className="flex-1 outline-none text-sm"
-                aria-label="Email"
-              />
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden p-8">
+          {serverError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm font-medium text-red-800">{serverError}</p>
             </div>
-            {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
-          </label>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <InputField
+              icon={Mail}
+              label="Email Address"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="john@cityhospital.com"
+              required
+              errors={errors}
+            />
 
-          <label className="block">
-            <span className="text-sm text-gray-600">Password</span>
-            <div className={clsx(
-              "mt-1 relative rounded-lg border px-3 py-2 flex items-center",
-              errors.password ? "border-red-300 bg-red-50" : "border-gray-200 bg-white"
-            )}>
-              <Lock className="h-4 w-4 text-gray-400 mr-2" />
-              <input
-                type={showPassword ? "text" : "password"}
-                value={form.password}
-                onChange={(e) => { setForm({ ...form, password: e.target.value }); if (errors.password) setErrors(prev => ({ ...prev, password: "" })); }}
-                placeholder="Your password"
-                className="flex-1 outline-none text-sm"
-                aria-label="Password"
-              />
+            <InputField
+              icon={Lock}
+              label="Password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Your password"
+              required
+            />
+
+            <div className="flex items-center justify-between text-sm">
+              
+              <label className="inline-flex items-center space-x-2 text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={form.remember}
+                  onChange={(e) => setForm({ ...form, remember: e.target.checked })}
+                  className="rounded border-slate-300"
+                />
+                <span className="text-slate-600">Remember me</span>
+              </label>
+
               <button
                 type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="ml-2 p-1 rounded text-gray-500 hover:text-gray-700"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={() => alert("Implement forgot password flow")}
+                className="cursor-pointer font-bold text-indigo-600 hover:text-indigo-700"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                 Forgot password?
               </button>
             </div>
-            {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
-          </label>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="inline-flex items-center space-x-2 text-gray-600">
-              <input
-                type="checkbox"
-                checked={form.remember}
-                onChange={(e) => setForm({ ...form, remember: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <span>Remember me</span>
-            </label>
             <button
-              type="button"
-              onClick={() => alert("Implement forgot password flow")}
-              className="text-blue-600 hover:underline"
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
             >
-              Forgot?
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  Sign In <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
-          </div>
+          </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full inline-flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-semibold transition"
-          >
-            {loading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center text-sm text-gray-500">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-blue-600 hover:underline font-medium">Create account</Link>
         </div>
+
+        <p className="text-center mt-6 text-sm text-slate-600">
+          Don't have an account?{" "}
+          <Link to="/signup" className="font-bold text-indigo-600 hover:text-indigo-700">Start Free Trial</Link>
+        </p>
       </div>
     </div>
   );

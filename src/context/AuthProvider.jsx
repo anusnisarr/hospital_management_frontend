@@ -4,7 +4,7 @@ import { useNavigate , useLocation } from "react-router-dom";
 import { AuthStore } from "../store/AuthStore"
 import { getNewAccessToken } from "../api/services/AuthService";
 
-const PUBLIC_ROUTES = ["/login", "/signup"];
+const PUBLIC_ROUTES = ["/login" , "/signup" , "/TenantRegister"];
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {

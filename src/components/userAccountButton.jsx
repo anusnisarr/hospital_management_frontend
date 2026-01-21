@@ -28,9 +28,10 @@ export default function UserAccountButton({ isCollapsed = false }) {
   };
 
   const getProfileDetails = () => {
-    
 
-    setUserDetails(AuthStore.getUser());
+    const user  = AuthStore.getUser();    
+
+    setUserDetails(user);
   };
 
   const handleSettings = () => {
@@ -61,27 +62,27 @@ export default function UserAccountButton({ isCollapsed = false }) {
         className={`flex items-center w-full ${
           isCollapsed ? 'justify-center' : 'justify-between'
         } px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-50 transition-all group relative border border-transparent hover:border-slate-200`}
-        title={isCollapsed ? userDetails.name : ''}
+        title={isCollapsed ? userDetails?.name : ''}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {/* Avatar */}
-          {userDetails.avatar ? (
+          {userDetails?.avatar ? (
             <img 
-              src={userDetails.avatar} 
-              alt={userDetails.name}
+              src={userDetails?.avatar} 
+              alt={userDetails?.name}
               className="w-8 h-8 rounded-full flex-shrink-0 border-2 border-slate-200"
             />
           ) : (
             <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold">
-              {getPlaceholderAvatar(userDetails.name)}
+              {getPlaceholderAvatar(userDetails?.name)}
             </div>
           )}
 
           {/* User Info - Hidden when collapsed */}
           {!isCollapsed && (
             <div className="flex-1 text-left min-w-0">
-              <p className="text-sm font-bold text-slate-900 truncate">{userDetails.name}</p>
-              <p className="text-xs text-slate-500 truncate">{userDetails.role}</p>
+              <p className="text-sm font-bold text-slate-900 truncate">{userDetails?.name}</p>
+              <p className="text-xs text-slate-500 truncate">{userDetails?.role}</p>
             </div>
           )}
         </div>
