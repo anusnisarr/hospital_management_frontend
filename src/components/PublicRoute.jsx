@@ -6,10 +6,6 @@ const PublicRoute = () => {
 
   const authStatus = AuthStore.getAuthStatus();
 
-  if (authStatus === "unknown") {
-    return <SplashScreen />;
-  }
-
   if (authStatus === "authenticated") {
     return <Navigate to="/" replace />;
   }

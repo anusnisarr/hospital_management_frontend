@@ -11,4 +11,4 @@ const BootstrapAuth = async () => {
   }
 };
 
-export default  BootstrapAuth;
+export default BootstrapAuth;

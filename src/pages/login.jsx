@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthStore } from "../store/AuthStore";
 import { InputField } from '../components/inputFields';
 
-// simple axios helper (replace baseURL with your env var)
 const API = axios.create({ baseURL: `${env.VITE_BASE_PATH}/auth` || "" });
 
 export default function Login({ onSuccess }) {
@@ -33,21 +32,21 @@ export default function Login({ onSuccess }) {
     return Object.keys(e).length === 0;
   };
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  setForm((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-
-  if (errors[name]) {
-    setErrors((prev) => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: "",
+      [name]: value,
     }));
-  }
-};
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
 
   const handleSubmit = async (ev) => {
     ev?.preventDefault();
@@ -116,7 +115,7 @@ const handleChange = (e) => {
               icon={Lock}
               label="Password"
               name="password"
-              type={showPassword ? "text" : "password"}
+              type="password"
               value={form.password}
               onChange={handleChange}
               placeholder="Your password"
@@ -166,9 +165,10 @@ const handleChange = (e) => {
 
         <p className="text-center mt-6 text-sm text-slate-600">
           Don't have an account?{" "}
-          <Link to="/signup" className="font-bold text-indigo-600 hover:text-indigo-700">Start Free Trial</Link>
+          <Link to="/CreateUser" className="font-bold text-indigo-600 hover:text-indigo-700">Start Free Trial</Link>
         </p>
       </div>
     </div>
   );
+
 }

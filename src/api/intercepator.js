@@ -65,7 +65,9 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        
         const res = await getNewAccessToken();
+        
 
         const newToken = res.accessToken;
         AuthStore.setAccessToken(newToken);

@@ -4,8 +4,7 @@ import { useNavigate , useLocation } from "react-router-dom";
 import { AuthStore } from "../store/AuthStore"
 import { getNewAccessToken } from "../api/services/AuthService";
 
-const PUBLIC_ROUTES = ["/login" , "/signup" , "/TenantRegister"];
-export const AuthContext = createContext();
+const PUBLIC_ROUTES = ["/login" , "/CreateUser" , "/TenantRegister"];
 
 export function AuthProvider({ children }) {
   
@@ -58,9 +57,10 @@ export function AuthProvider({ children }) {
   if (loading) return null;
   
   return (
-    <AuthContext.Provider value={{ accessToken, user, setAccessToken, setUser }}>
+<>
       {children}
-    </AuthContext.Provider>
+
+</>
   );
 }
 

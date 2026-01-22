@@ -79,7 +79,7 @@ export function TenantRegister() {
     setError(null);
 
     try {
-      const response = await fetch('/api/public/register', {
+      const response = await fetch('/public/createUser', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,7 +112,7 @@ export function TenantRegister() {
         setError(data.message || 'Registration failed');
       }
     } catch (err) {
-      setError('Failed to register. Please try again.');
+      setError('Failed to createUser. Please try again.');
       console.error('Registration error:', err);
     } finally {
       setLoading(false);
