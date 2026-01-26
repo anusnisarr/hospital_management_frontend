@@ -1,32 +1,27 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useEffect } from "react";
+import { Navigate, Outlet, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { AuthStore } from "../store/AuthStore";
 import SplashScreen from "./SplashScreen";
 import BootstrapAuth from "./BootstrapAuth";
+
 const ProtectedRoute = () => {
+  const { tenantSlug } = useParams();
+  const [loading, setLoading] = useState(true);
 
-    const [loading, setLoading] = React.useState(true);
-  
-    const authStatus = AuthStore.getAuthStatus();
+  const authStatus = AuthStore.getAuthStatus();
 
-    useEffect(() => {
-      BootstrapAuth().finally(() => setLoading(false));
-    }, []);
+  useEffect(() => {
+    BootstrapAuth().finally(() => setLoading(false));
+  }, []);
 
-    if (loading) {
-      return <SplashScreen />;
-    }
-
-
-  if (authStatus === "unknown") {
+  if (loading || authStatus === "unknown") {
     return <SplashScreen />;
   }
 
   if (authStatus !== "authenticated") {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={`/${tenantSlug}/login`} replace />;
   }
 
- 
   return <Outlet />;
 };
 

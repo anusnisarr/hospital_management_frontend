@@ -1,10 +1,11 @@
 import './App.css';
-import { useEffect, useState } from 'react';
-import {Routes, Route ,useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import PublicRoute from './components/PublicRoute.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
 import { setNavigate } from './navigation/NavigationService.js';
 import { TenantRegister } from './pages/TenantRegister.jsx';
+import TenantGuard from "./components/TenantGuard";
 
 import Layout from './components/Layout';
 import CreateUser from './pages/CreateUser';
@@ -17,7 +18,6 @@ import PatientDetail from './pages/PatientDetail';
 import { DataTableGuide } from './pages/Guide';
 
 const App = () => {
-
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -25,26 +25,33 @@ const App = () => {
     }, [navigate]);
 
     return (
-                <Routes>
-                    <Route element={<PublicRoute />}>
-                        <Route path="TenantRegister" element={<TenantRegister />} />
-                        <Route path="Login" element={<Login />} />
-                        <Route path="createUser" element={<CreateUser />} />
-                    </Route>
-                    <Route element={<ProtectedRoute />}>
-                        <Route path="/" element={<Layout />}>
-                            <Route index element={<PatientRegistration />} />
-                            <Route path="Patients" element={<PatientRegistration />} />
-                            <Route path="DoctorScreen" element={<DoctorScreen />} />
-                            <Route path="VisitHistory" element={<VisitHistory />} />
-                            <Route path="PatientList" element={<PatientList />} />
-                            <Route path="Guide" element={<DataTableGuide />} />
-                            <Route path="patient/:patientId" element={<PatientDetail />} />
+        <Routes>
+            {/* ---------- TENANT REGISTRATION (NO TENANT REQUIRED) ---------- */}
+            <Route path="/register" element={<TenantRegister />} />
 
-                        </Route>
+            {/* ---------- PUBLIC ROUTES (TENANT REQUIRED) ---------- */}
+            <Route path="/:tenantSlug" element={<TenantGuard />}>
+                <Route element={<PublicRoute />}>
+                    <Route path="login" element={<Login />} />
+                    <Route path="createUser" element={<CreateUser />} />
+                </Route>
+
+                {/* ---------- PROTECTED ROUTES ---------- */}
+                <Route element={<ProtectedRoute />}>
+                    <Route element={<Layout />}>
+                        <Route index element={<PatientRegistration />} />
+                        <Route path="patients" element={<PatientList />} />
+                        <Route path="patients/:patientId" element={<PatientDetail />} />
+                        <Route path="doctor-screen" element={<DoctorScreen />} />
+                        <Route path="visits" element={<VisitHistory />} />
+                        <Route path="settings" element={<DataTableGuide />} />
                     </Route>
-                </Routes>
-    
+                </Route>
+            </Route>
+
+            {/* ---------- FALLBACK - Redirect to registration ---------- */}
+            <Route path="*" element={<TenantRegister />} />
+        </Routes>
     );
 };
 

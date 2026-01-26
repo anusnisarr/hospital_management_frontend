@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Building2, Mail, Phone, MapPin, User, Lock, ArrowRight, Check, X, Loader2, ExternalLink } from 'lucide-react';
 import { InputField } from '../components/inputFields';
+import { useNavigate } from 'react-router-dom';
+import API from '../api/apiInstance';
 
 export function TenantRegister() {
-    
+  
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [slugAvailable, setSlugAvailable] = useState(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
-
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     // Business Info
     businessName: '',
     slug: '',
-    email: '',
+    businessEmail: '',
     phone: '',
     businessType: 'clinic',
     
@@ -54,8 +57,8 @@ export function TenantRegister() {
       if (formData.slug && formData.slug.length >= 3) {
         setCheckingSlug(true);
         try {
-          const response = await fetch(`/api/public/check-slug/${formData.slug}`);
-          const data = await response.json();
+          const response = await API.post(`/api/public/check-slug/${formData.slug}`);
+          const data = response.data;
           setSlugAvailable(data.available);
         } catch (err) {
           console.error('Error checking slug:', err);
@@ -79,44 +82,48 @@ export function TenantRegister() {
     setError(null);
 
     try {
-      const response = await fetch('/public/createUser', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          businessName: formData.businessName,
-          email: formData.email,
-          phone: formData.phone,
-          businessType: formData.businessType,
-          address: {
-            street: formData.street,
-            city: formData.city,
-            state: formData.state,
-            country: formData.country,
-            zipCode: formData.zipCode
-          },
-          adminName: formData.adminName,
-          adminEmail: formData.adminEmail,
-          adminPassword: formData.adminPassword
-        })
-      });
+  setLoading(true);
 
-      const data = await response.json();
+  const body = {
+    businessName: formData.businessName,
+    businessEmail: formData.businessEmail,
+    phone: formData.phone,
+    businessType: formData.businessType,
+    address: {
+      street: formData.street,
+      city: formData.city,
+      state: formData.state,
+      country: formData.country,
+      zipCode: formData.zipCode
+    },
+    adminName: formData.adminName,
+    adminEmail: formData.adminEmail,
+    adminPassword: formData.adminPassword
+  };
 
-      if (data.success) {
-        // Store token
-        localStorage.setItem('token', data.data.token);
-        
-        // Redirect to tenant dashboard
-        window.location.href = `/${data.data.tenant.slug}`;
-      } else {
-        setError(data.message || 'Registration failed');
-      }
-    } catch (err) {
-      setError('Failed to createUser. Please try again.');
-      console.error('Registration error:', err);
-    } finally {
-      setLoading(false);
-    }
+  const response = await API.post("/public/register", body);
+  
+  const { success, data, message } = response.data;
+  
+  if (!success) {
+    setError(message || "Registration failed");
+    return;
+  }
+
+  navigate(`/${data.tenant.slug}/login`, { replace: true });
+
+} catch (err) {
+  console.error("Tenant registration error:", err);
+
+  const apiMessage =
+    err?.response?.data?.message ||
+    "Failed to register tenant. Please try again.";
+
+  setError(apiMessage);
+
+} finally {
+  setLoading(false);
+}
   };
 
   return (
@@ -207,9 +214,9 @@ export function TenantRegister() {
                   <InputField
                     icon={Mail}
                     label="Business Email"
-                    name="email"
+                    name="businessEmail"
                     type="email"
-                    value={formData.email}
+                    value={formData.businessEmail}
                     onChange={handleChange}
                     placeholder="contact@cityhospital.com"
                     required
@@ -244,7 +251,7 @@ export function TenantRegister() {
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    disabled={!formData.businessName || !formData.email || slugAvailable === false}
+                    disabled={!formData.businessName || !formData.businessEmail || slugAvailable === false}
                     className="flex-1 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
                   >
                     Continue <ArrowRight className="w-5 h-5" />

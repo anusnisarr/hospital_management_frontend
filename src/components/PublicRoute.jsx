@@ -1,13 +1,12 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useParams } from "react-router-dom";
 import { AuthStore } from "../store/AuthStore";
-import SplashScreen from "./SplashScreen";
 
 const PublicRoute = () => {
-
+  const { tenantSlug } = useParams();  
   const authStatus = AuthStore.getAuthStatus();
 
   if (authStatus === "authenticated") {
-    return <Navigate to="/" replace />;
+    return <Navigate to={`/${tenantSlug}`} replace />;
   }
 
   return <Outlet />;
