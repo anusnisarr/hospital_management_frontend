@@ -11,3 +11,11 @@ export const navigateToLogin = () => {
     window.location.href = "/login";
   }
 };
+
+export const navigateToRegister = () => {
+  if (navigateFn) {
+    navigateFn("/register", { replace: true });
+  } else {
+    window.location.href = "/register";
+  }
+};

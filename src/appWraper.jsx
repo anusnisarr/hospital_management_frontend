@@ -7,10 +7,10 @@ const AppWrapper = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setNavigate(navigate);  // Set global navigate for utils/interceptors
+    setNavigate(navigate);
   }, [navigate]);
 
-  return <App />;           // Render your main app (routes, layout)
+  return <App />;
 };
 
 export default AppWrapper;

@@ -1,9 +1,7 @@
 import './App.css';
-import { useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import PublicRoute from './components/PublicRoute.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
-import { setNavigate } from './navigation/NavigationService.js';
 import { TenantRegister } from './pages/TenantRegister.jsx';
 import TenantGuard from "./components/TenantGuard";
 
@@ -18,11 +16,6 @@ import PatientDetail from './pages/PatientDetail';
 import { DataTableGuide } from './pages/Guide';
 
 const App = () => {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        setNavigate(navigate);
-    }, [navigate]);
 
     return (
         <Routes>
